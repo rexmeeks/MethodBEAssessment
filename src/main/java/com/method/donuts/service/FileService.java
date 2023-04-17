@@ -8,6 +8,6 @@ import org.springframework.web.multipart.MultipartFile;
 public class FileService {
 
     public ResponseDO digestFile(MultipartFile file) {
-
+        return null;
     }
 }

@@ -18,5 +18,6 @@ public class Liability {
     public String data_source;
     public Date data_updated_at;
     public String ownership;
+    public String number; // is this irony?
     public StudentLoan student_loan;
 }

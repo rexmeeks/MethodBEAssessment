@@ -3,10 +3,12 @@ package com.method.donuts.bos.report.xml;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 public class PayInfoBO {
 
-    private RowBO row;
+    private List<RowBO> row;
 
 }

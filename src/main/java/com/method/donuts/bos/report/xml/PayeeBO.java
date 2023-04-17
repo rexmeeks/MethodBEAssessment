@@ -12,5 +12,5 @@ public class PayeeBO {
     private String plaidId;
 
     @JsonProperty("LoanAccountNumber")
-    private Integer loanAccountNumber;
+    private String loanAccountNumber;
 }

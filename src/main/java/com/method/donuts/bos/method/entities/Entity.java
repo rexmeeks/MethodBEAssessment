@@ -1,5 +1,7 @@
 package com.method.donuts.bos.method.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.method.donuts.bos.method.accounts.Account;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -23,4 +25,10 @@ public class Entity {
     public Object metadata;
     public Date created_at;
     public Date updated_at;
+
+    @JsonIgnore
+    public Account achAccount;
+
+    @JsonIgnore
+    public Account liability;
 }

@@ -15,7 +15,7 @@ public class RowBO {
     private PayorBO payor;
 
     @JsonProperty("Payee")
-    private PayeeBO payeeBO;
+    private PayeeBO payee;
 
     @JsonProperty("Amount")
     private String amount;

@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.sql.Date;
 
 @Getter
 @Setter
@@ -23,7 +22,7 @@ public class EmployeeBO {
     private String lastName;
 
     @JsonProperty("DOB")
-    private Date dateOfBirth;
+    private String dateOfBirth;
 
     @JsonProperty("PhoneNumber")
     private String phoneNumber;

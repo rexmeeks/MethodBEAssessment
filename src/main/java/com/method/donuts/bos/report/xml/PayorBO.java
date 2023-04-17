@@ -12,10 +12,10 @@ public class PayorBO {
     private String dunkinId;
 
     @JsonProperty("DunkinId")
-    private Integer ABARouting;
+    private String ABARouting;
 
     @JsonProperty("AccountNumber")
-    private Integer accountNumber;
+    private String accountNumber;
 
     @JsonProperty("Name")
     private String name;
@@ -24,7 +24,7 @@ public class PayorBO {
     private String dba;
 
     @JsonProperty("EIN")
-    private Integer ein;
+    private String ein;
 
     @JsonProperty("Address")
     private AddressBO address;
