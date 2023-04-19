@@ -87,6 +87,7 @@ public class FileTransformer {
                 corporationEntity.setAchAccount(achAccount);
                 corporationEntity.setCorporation(corporation);
                 corporationEntity.setAddress(corporationAddress);
+                corporationEntity.setType("c_corporation");
                 stores.put(payorBO.getDunkinId(), corporationEntity);
             }
             return Triple.of(individualEntity, payment, dunkinCorpId);
