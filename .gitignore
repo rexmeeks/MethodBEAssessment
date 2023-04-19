@@ -33,5 +33,3 @@ build/
 .vscode/
 
 .DS_Store
-
-*.xml
