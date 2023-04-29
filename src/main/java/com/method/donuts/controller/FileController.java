@@ -2,7 +2,9 @@ package com.method.donuts.controller;
 
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.method.donuts.bos.report.xml.PayInfoBO;
+import com.method.donuts.service.FileService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -13,20 +15,26 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 
 @Controller
 @Slf4j
 public class FileController {
 
-    @PostMapping("/uploadPayouts")
-    public ResponseEntity uploadPaylist(@RequestParam("file") MultipartFile file) {
-        try {
+    @Autowired
+    private FileService fileService;
 
+    @PostMapping("/uploadPayouts")
+    public ResponseEntity<String> uploadPaylist(@RequestParam("file") MultipartFile file) {
+        if(file.isEmpty()) {
+            return new ResponseEntity<>("should've uploaded a file, kid", HttpStatus.BAD_REQUEST);
+        }
+
+        if(file.getOriginalFilename() == null) {
+            return new ResponseEntity<>("i think files without names are bad news, probably", HttpStatus.BAD_REQUEST);
+        }
+
+        try {
             File path = new File(file.getOriginalFilename());
             path.createNewFile();
             FileOutputStream output = new FileOutputStream(path);
@@ -35,6 +43,7 @@ public class FileController {
 
             XmlMapper xmlMapper = new XmlMapper();
             PayInfoBO payInfoBO = xmlMapper.readValue(path, PayInfoBO.class);
+            fileService.digestPayInfo(payInfoBO);
 
             log.info("test");
 
@@ -42,7 +51,7 @@ public class FileController {
             log.error(e.getMessage());
             e.printStackTrace();
         }
-        return new ResponseEntity(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping("/payoutReports")

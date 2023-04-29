@@ -7,6 +7,9 @@ import lombok.Setter;
 
 import java.sql.Date;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -30,5 +33,5 @@ public class Entity {
     public Account achAccount;
 
     @JsonIgnore
-    public Account liability;
+    public Map<String, Account> liabilities = new HashMap<>();
 }

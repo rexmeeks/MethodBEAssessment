@@ -14,7 +14,7 @@ public class Payment {
     public Object destination_trace_id;
     public String source;
     public String destination;
-    public int amount;
+    public Float amount;
     public String description;
     public String status;
     public Object error;
