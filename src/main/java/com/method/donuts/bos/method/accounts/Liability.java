@@ -1,5 +1,6 @@
 package com.method.donuts.bos.method.accounts;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,16 +9,20 @@ import java.sql.Date;
 @Getter
 @Setter
 public class Liability {
-    public String mch_id;
-    public String mask;
-    public String type;
-    public String payment_status;
-    public String data_status;
-    public Date data_last_successful_sync;
-    public Object data_status_error;
-    public String data_source;
-    public Date data_updated_at;
-    public String ownership;
-    public String number; // is this irony?
-    public StudentLoan student_loan;
+    private String mch_id;
+    private String mask;
+    private String type;
+    private String payment_status;
+    private String data_status;
+    private Date data_last_successful_sync;
+    private Object data_status_error;
+    private String data_source;
+    private Date data_updated_at;
+    private String ownership;
+    private String number; // is this irony?
+    private StudentLoan student_loan;
+
+    @JsonIgnore
+    private String plaid_id;
+    
 }

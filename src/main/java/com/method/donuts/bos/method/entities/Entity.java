@@ -1,6 +1,7 @@
 package com.method.donuts.bos.method.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.method.donuts.bos.method.accounts.Account;
 import lombok.Getter;
 import lombok.Setter;
@@ -8,11 +9,11 @@ import lombok.Setter;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Getter
 @Setter
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class Entity {
     public String id;
     public String type;

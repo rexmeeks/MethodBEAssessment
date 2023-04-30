@@ -1,9 +1,15 @@
 package com.method.donuts.service.method;
 
+import com.method.donuts.bos.method.base.BaseResponse;
+import com.method.donuts.bos.method.entities.DataEntity;
 import com.method.donuts.bos.method.entities.Entity;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpMethod;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -18,18 +24,32 @@ public class MethodEntityService {
     @Autowired
     private RestTemplate restTemplate;
 
-    public Entity createEntity(Entity entityToCreate) {
+    @Value("${api-key}")
+    private String apiKey;
 
-        Entity responseEntity = new Entity();
+    public String createEntity(Entity entityToCreate) {
+
+        DataEntity dataEntity;
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + apiKey);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<Entity> request = new HttpEntity<>(entityToCreate, headers);
 
         try {
-            responseEntity = restTemplate.postForObject("https://demo.methodfi.com/entities", entityToCreate, Entity.class);
+            dataEntity = restTemplate.postForObject("https://dev.methodfi.com/entities", request, DataEntity.class);
         } catch (Exception e) {
             log.error("oops lmao, retrieve entity failed");
             log.error(e.getMessage());
+            return null;
         }
 
-        return responseEntity;
+        if(dataEntity != null && !dataEntity.getData().isEmpty() && dataEntity.getData().get(0) != null) {
+            return dataEntity.getData().get(0).getId();
+        }
+
+        return null;
     }
 
     public List<Entity> retrieveAllEntities(String type) {
@@ -37,7 +57,7 @@ public class MethodEntityService {
 
         // todo set params for individual vs corporation
         try {
-            Entity[] entitiesResponse = restTemplate.getForObject("https://demo.methodfi.com/entities", Entity[].class);
+            Entity[] entitiesResponse = restTemplate.getForObject("https://dev.methodfi.com/entities", Entity[].class);
             if (entitiesResponse != null) {
                entityList = Arrays.asList(entitiesResponse);
             }

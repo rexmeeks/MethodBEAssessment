@@ -36,6 +36,8 @@ public class FileTransformer {
         Map<String, List<Account>> individualAccounts = new HashMap<>();
         Map<String, Map<MultiKey<String>, Payment>> userPayments = new HashMap<>();
 
+        Map<String, String> merchants = new HashMap<>();
+
         // todo set metadata here?
 
         // I gotta return a lot of shit, so I just probably make an object that holds it all
@@ -67,7 +69,8 @@ public class FileTransformer {
             }
 
             loanLiability.setNumber(payeeBO.getLoanAccountNumber());
-            loanLiability.setMch_id(payeeBO.getPlaidId());
+            loanLiability.setPlaid_id(payeeBO.getPlaidId());
+            merchants.putIfAbsent(payeeBO.getPlaidId(), "");
             loanAccount.setLiability(loanLiability);
 
             if(individuals.containsKey(dunkinIndividualId)) {
@@ -77,7 +80,7 @@ public class FileTransformer {
             } else {
                 individual.setFirst_name(employeeBO.getFirstName());
                 individual.setLast_name(employeeBO.getLastName());
-                individual.setPhone(employeeBO.getPhoneNumber());
+                individual.setPhone("15121231111");
                 individual.setDob(employeeBO.getDateOfBirth());
                 individualEntity.setIndividual(individual);
                 individualEntity.getLiabilities().put(payeeBO.getLoanAccountNumber(), loanAccount);
@@ -107,7 +110,7 @@ public class FileTransformer {
             }
         }));
 
-        return new MethodObjects(stores, individuals, individualAccounts, userPayments);
+        return new MethodObjects(stores, individuals, individualAccounts, userPayments, merchants);
 
     }
 
