@@ -1,5 +1,8 @@
 package com.method.donuts;
 
+import io.github.bucket4j.Bandwidth;
+import io.github.bucket4j.Bucket;
+import io.github.bucket4j.Refill;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -8,6 +11,7 @@ import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,5 +30,12 @@ public class DonutsApplication {
         interceptors.add(new LoggingRequestInterceptor());
         restTemplate.setInterceptors(interceptors);
         return restTemplate;
+    }
+
+    @Bean
+    public Bucket getBucket() {
+        Bandwidth limit = Bandwidth.simple(600, Duration.ofMinutes(1));
+        // construct the bucket
+        return Bucket.builder().addLimit(limit).build();
     }
 }

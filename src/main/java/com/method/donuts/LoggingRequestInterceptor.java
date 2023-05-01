@@ -12,7 +12,7 @@ import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
 
 
-// copied of the internet because i couldn't figure out how I was getting bad request
+// copied off the internet because i couldn't figure out how I was getting bad request
 public class LoggingRequestInterceptor implements ClientHttpRequestInterceptor {
 
     final static Logger log = LoggerFactory.getLogger(LoggingRequestInterceptor.class);

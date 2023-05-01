@@ -1,8 +1,8 @@
 package com.method.donuts.service.method;
 
-import com.method.donuts.bos.method.base.BaseResponse;
-import com.method.donuts.bos.method.entities.DataEntity;
+import com.method.donuts.bos.method.entities.EntityData;
 import com.method.donuts.bos.method.entities.Entity;
+import io.github.bucket4j.Bucket;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,9 +27,12 @@ public class MethodEntityService {
     @Value("${api-key}")
     private String apiKey;
 
+    @Autowired
+    private Bucket bucket;
+
     public String createEntity(Entity entityToCreate) {
 
-        DataEntity dataEntity;
+        EntityData entityData;
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + apiKey);
@@ -38,15 +41,21 @@ public class MethodEntityService {
         HttpEntity<Entity> request = new HttpEntity<>(entityToCreate, headers);
 
         try {
-            dataEntity = restTemplate.postForObject("https://dev.methodfi.com/entities", request, DataEntity.class);
+            bucket.asBlocking().consume(1);
+            entityData = restTemplate.postForObject("https://dev.methodfi.com/entities", request, EntityData.class);
+        } catch(InterruptedException e) {
+            log.error("bucket blocking was interuppted, but probably shouldn't happen");
+            log.error(e.getMessage());
+            return null;
         } catch (Exception e) {
+            // todo add interupted exception and more specific exception
             log.error("oops lmao, retrieve entity failed");
             log.error(e.getMessage());
             return null;
         }
 
-        if(dataEntity != null && !dataEntity.getData().isEmpty() && dataEntity.getData().get(0) != null) {
-            return dataEntity.getData().get(0).getId();
+        if(entityData != null && !entityData.getData().isEmpty() && entityData.getData().get(0) != null) {
+            return entityData.getData().get(0).getId();
         }
 
         return null;

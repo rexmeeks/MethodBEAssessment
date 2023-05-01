@@ -18,6 +18,8 @@ import org.apache.commons.collections4.keyvalue.MultiKey;
 import org.apache.commons.lang3.tuple.Triple;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -81,8 +83,10 @@ public class FileTransformer {
                 individual.setFirst_name(employeeBO.getFirstName());
                 individual.setLast_name(employeeBO.getLastName());
                 individual.setPhone("15121231111");
-                individual.setDob(employeeBO.getDateOfBirth());
+                // todo this will need some error handling to ignore shitty dates
+                individual.setDob(LocalDate.parse(employeeBO.getDateOfBirth(), DateTimeFormatter.ofPattern("MM-dd-yyyy")).toString());
                 individualEntity.setIndividual(individual);
+                individualEntity.setType("individual");
                 individualEntity.getLiabilities().put(payeeBO.getLoanAccountNumber(), loanAccount);
 
                 individuals.put(dunkinIndividualId, individualEntity);
