@@ -15,24 +15,24 @@ import java.util.Map;
 @Setter
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class Entity {
-    public String id;
-    public String type;
-    public Individual individual;
-    public Corporation corporation;
-    public Object receive_only;
-    public Address address;
-    public ArrayList<String> capabilities;
-    public ArrayList<String> available_capabilities;
-    public ArrayList<String> pending_capabilities;
-    public Object error;
-    public String status;
-    public Object metadata;
-    public Date created_at;
-    public Date updated_at;
+    private String id;
+    private String type;
+    private Individual individual;
+    private Corporation corporation;
+    private Object receive_only;
+    private Address address;
+    private ArrayList<String> capabilities;
+    private ArrayList<String> available_capabilities;
+    private ArrayList<String> pending_capabilities;
+    private Object error;
+    private String status;
+    private Object metadata;
+    private Date created_at;
+    private Date updated_at;
 
     @JsonIgnore
-    public Account achAccount;
+    private Account achAccount;
 
     @JsonIgnore
-    public Map<String, Account> liabilities = new HashMap<>();
+    private Map<String, Account> liabilities = new HashMap<>();
 }

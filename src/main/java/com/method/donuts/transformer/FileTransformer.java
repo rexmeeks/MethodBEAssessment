@@ -36,7 +36,8 @@ public class FileTransformer {
         Map<String, Entity> stores = new HashMap<>();
         Map<String, Entity> individuals = new HashMap<>();
         Map<String, List<Account>> individualAccounts = new HashMap<>();
-        Map<String, Map<MultiKey<String>, Payment>> userPayments = new HashMap<>();
+        // todo this is the ugliest thing I have ever done in my life
+        Map<String, Map<MultiKey<String>, Map<String, Payment>>> userPayments = new HashMap<>();
 
         Map<String, String> merchants = new HashMap<>();
 
@@ -60,15 +61,13 @@ public class FileTransformer {
 
             setCorportation(stores, payorBO, dunkinCorpId);
 
-            MultiKey<String> multiKey = new MultiKey<>(payeeBO.getPlaidId(), payeeBO.getLoanAccountNumber(), payorBO.getDunkinId());
+            // multikey is plaidId, loanAccountNumber, and corpId
+            MultiKey<String> multiKey = new MultiKey<>(payeeBO.getPlaidId(), payeeBO.getLoanAccountNumber());
 
             //todo this could maybe not work, set to getIfPresent
             // error handle this shit
-            payment.setAmount(Float.parseFloat(rowBO.getAmount().substring(1)));
-
-            if(payment.getAmount() == null) {
-                log.warn("this shouldn't happen");
-            }
+            payment.setAmount(Math.round(Float.parseFloat(rowBO.getAmount().substring(1)) * 100));
+            payment.setDescription("Loan pmt");
 
             loanLiability.setNumber(payeeBO.getLoanAccountNumber());
             loanLiability.setPlaid_id(payeeBO.getPlaidId());
@@ -76,7 +75,7 @@ public class FileTransformer {
             loanAccount.setLiability(loanLiability);
 
             if(individuals.containsKey(dunkinIndividualId)) {
-                if(!individuals.get(dunkinIndividualId).liabilities.containsKey(payeeBO.getLoanAccountNumber())) {
+                if(!individuals.get(dunkinIndividualId).getLiabilities().containsKey(payeeBO.getLoanAccountNumber())) {
                     individuals.get(dunkinIndividualId).getLiabilities().put(payeeBO.getLoanAccountNumber(), loanAccount);
                 }
             } else {
@@ -101,13 +100,27 @@ public class FileTransformer {
 
             if(userPayments.containsKey(dunkinIndividualId)) {
                 if (userPayments.get(dunkinIndividualId).containsKey(multiKey)) {
-                    userPayments.get(dunkinIndividualId).get(multiKey).setAmount(Float.parseFloat(rowBO.getAmount().substring(1)) + userPayments.get(dunkinIndividualId).get(multiKey).getAmount());
+                    // todo create a case where this can be tested? Or don't
+                    if(userPayments.get(dunkinIndividualId).get(multiKey).containsKey(payorBO.getDunkinId())) {
+                        Payment temp = userPayments.get(dunkinIndividualId).get(multiKey).get(payorBO.getDunkinId());
+                        log.error("amount = {}", temp.getAmount());
+                        // todo probably make sure this works, with the temp part, this is a disaster waiting to happen tho if a value isn't right
+                        temp.setAmount(Math.round(Float.parseFloat(rowBO.getAmount().substring(1)) + temp.getAmount()));
+                        log.error("amount after = {}", temp.getAmount());
+//                        userPayments.get(dunkinIndividualId).get(multiKey).get(payorBO.getDunkinId()).setAmount(Float.parseFloat(rowBO.getAmount().substring(1)) + temp.getAmount());
+                    } else {
+                        userPayments.get(dunkinIndividualId).get(multiKey).put(payorBO.getDunkinId(), payment);
+                    }
                 } else {
-                    userPayments.get(dunkinIndividualId).put(multiKey, payment);
+                    Map<String, Payment> temp = new HashMap<>();
+                    temp.put(payorBO.getDunkinId(), payment);
+                    userPayments.get(dunkinIndividualId).put(multiKey, temp);
                 }
             } else {
-                Map<MultiKey<String>, Payment> newUserPaymentMap = new HashMap<>();
-                newUserPaymentMap.put(multiKey, payment);
+                Map<MultiKey<String>, Map<String, Payment>> newUserPaymentMap = new HashMap<>();
+                Map<String, Payment> temp = new HashMap<>();
+                temp.put(payorBO.getDunkinId(), payment);
+                newUserPaymentMap.put(multiKey, temp);
                 userPayments.put(dunkinIndividualId, newUserPaymentMap);
                 // this looks sketchy, should do something about this, put it in another method
                 // theoretically if a user exists there will exist a payment map

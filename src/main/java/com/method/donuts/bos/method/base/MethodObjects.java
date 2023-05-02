@@ -18,14 +18,14 @@ public class MethodObjects {
     private Map<String, Entity> stores;
     private Map<String, Entity> individuals;
     private Map<String, List<Account>> individualAccounts;
-    private Map<String, Map<MultiKey<String>, Payment>> userPayments;
+    private Map<String, Map<MultiKey<String>, Map<String, Payment>>> userPayments;
     private Map<String, String> merchants;
 
     public MethodObjects(){
 
     }
 
-    public MethodObjects(Map<String, Entity> stores, Map<String, Entity> individuals, Map<String, List<Account>> individualAccounts, Map<String, Map<MultiKey<String>, Payment>> userPayments, Map<String, String> merchants) {
+    public MethodObjects(Map<String, Entity> stores, Map<String, Entity> individuals, Map<String, List<Account>> individualAccounts, Map<String, Map<MultiKey<String>, Map<String, Payment>>> userPayments, Map<String, String> merchants) {
         this.stores = stores;
         this.individuals = individuals;
         this.individualAccounts = individualAccounts;

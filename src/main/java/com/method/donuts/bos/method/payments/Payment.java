@@ -1,5 +1,6 @@
 package com.method.donuts.bos.method.payments;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -7,22 +8,23 @@ import java.sql.Date;
 
 @Getter
 @Setter
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class Payment {
-    public String id;
-    public Object reversal_id;
-    public Object source_trace_id;
-    public Object destination_trace_id;
-    public String source;
-    public String destination;
-    public Float amount;
-    public String description;
-    public String status;
-    public Object error;
-    public Object metadata;
-    public String estimated_completion_date;
-    public String source_settlement_date;
-    public String destination_settlement_date;
-    public Object fee;
-    public Date created_at;
-    public Date updated_at;
+    private String id;
+    private Object reversal_id;
+    private Object source_trace_id;
+    private Object destination_trace_id;
+    private String source;
+    private String destination;
+    private Integer amount;
+    private String description;
+    private String status;
+    private Object error;
+    private Object metadata;
+    private String estimated_completion_date;
+    private String source_settlement_date;
+    private String destination_settlement_date;
+    private Object fee;
+    private Date created_at;
+    private Date updated_at;
 }
