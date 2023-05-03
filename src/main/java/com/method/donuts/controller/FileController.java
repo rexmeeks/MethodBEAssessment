@@ -37,7 +37,7 @@ public class FileController {
         try {
             File path = new File(file.getOriginalFilename());
             path.createNewFile();
-            FileOutputStream output = new FileOutputStream("files//" + path);
+            FileOutputStream output = new FileOutputStream(path);
             output.write(file.getBytes());
             output.close();
 
