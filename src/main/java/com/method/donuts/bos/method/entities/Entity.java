@@ -3,6 +3,7 @@ package com.method.donuts.bos.method.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.method.donuts.bos.method.accounts.Account;
+import com.method.donuts.bos.method.base.Metadata;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -26,7 +27,7 @@ public class Entity {
     private ArrayList<String> pending_capabilities;
     private Object error;
     private String status;
-    private Object metadata;
+    private Metadata metadata;
     private Date created_at;
     private Date updated_at;
 

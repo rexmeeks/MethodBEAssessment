@@ -1,7 +1,5 @@
 package com.method.donuts.service.method;
 
-import com.method.donuts.bos.method.accounts.Account;
-import com.method.donuts.bos.method.accounts.AccountData;
 import com.method.donuts.bos.method.payments.Payment;
 import com.method.donuts.bos.method.payments.PaymentData;
 import io.github.bucket4j.Bucket;

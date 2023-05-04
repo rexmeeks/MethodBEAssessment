@@ -3,6 +3,7 @@ package com.method.donuts.transformer;
 import com.method.donuts.bos.method.accounts.Account;
 import com.method.donuts.bos.method.accounts.Ach;
 import com.method.donuts.bos.method.accounts.Liability;
+import com.method.donuts.bos.method.base.Metadata;
 import com.method.donuts.bos.method.base.MethodObjects;
 import com.method.donuts.bos.method.entities.Address;
 import com.method.donuts.bos.method.entities.Corporation;
@@ -68,6 +69,7 @@ public class FileTransformer {
             // error handle this shit
             payment.setAmount(Math.round(Float.parseFloat(rowBO.getAmount().substring(1)) * 100));
             payment.setDescription("Loan pmt");
+            payment.setMetadata(new Metadata(dunkinCorpId, dunkinIndividualId));
 
             loanLiability.setNumber(payeeBO.getLoanAccountNumber());
             loanLiability.setPlaid_id(payeeBO.getPlaidId());
@@ -87,6 +89,7 @@ public class FileTransformer {
                 individualEntity.setIndividual(individual);
                 individualEntity.setType("individual");
                 individualEntity.getLiabilities().put(payeeBO.getLoanAccountNumber(), loanAccount);
+                individualEntity.setMetadata(new Metadata(dunkinIndividualId));
 
                 individuals.put(dunkinIndividualId, individualEntity);
 
@@ -106,6 +109,7 @@ public class FileTransformer {
                         log.error("amount = {}", temp.getAmount());
                         // todo probably make sure this works, with the temp part, this is a disaster waiting to happen tho if a value isn't right
                         temp.setAmount(Math.round(Float.parseFloat(rowBO.getAmount().substring(1)) + temp.getAmount()));
+                        temp.setMetadata(new Metadata(dunkinCorpId, dunkinIndividualId));
                         log.error("amount after = {}", temp.getAmount());
 //                        userPayments.get(dunkinIndividualId).get(multiKey).get(payorBO.getDunkinId()).setAmount(Float.parseFloat(rowBO.getAmount().substring(1)) + temp.getAmount());
                     } else {
@@ -161,6 +165,7 @@ public class FileTransformer {
             corporationEntity.setCorporation(corporation);
             corporationEntity.setAddress(corporationAddress);
             corporationEntity.setType("c_corporation");
+            corporationEntity.setMetadata(new Metadata(dunkinCorpId));
             stores.put(payorBO.getDunkinId(), corporationEntity);
         }
     }

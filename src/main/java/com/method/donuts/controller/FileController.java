@@ -43,7 +43,7 @@ public class FileController {
 
             XmlMapper xmlMapper = new XmlMapper();
             PayInfoBO payInfoBO = xmlMapper.readValue(path, PayInfoBO.class);
-            fileService.digestPayInfo(payInfoBO);
+            fileService.digestPayInfo(payInfoBO, path.getName());
 
             log.info("test");
 

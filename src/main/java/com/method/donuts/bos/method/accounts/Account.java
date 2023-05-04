@@ -1,6 +1,7 @@
 package com.method.donuts.bos.method.accounts;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.method.donuts.bos.method.base.Metadata;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,15 +12,16 @@ import java.util.ArrayList;
 @Setter
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class Account {
-    public String id;
-    public String holder_id;
-    public String type;
-    public Ach ach;
-    public Liability liability;
-    public String status;
-    public ArrayList<String> capabilities;
-    public ArrayList<Object> available_capabilities;
-    public Object error;
-    public Date created_at;
-    public Date updated_at;
+    private String id;
+    private String holder_id;
+    private String type;
+    private Ach ach;
+    private Liability liability;
+    private String status;
+    private ArrayList<String> capabilities;
+    private ArrayList<Object> available_capabilities;
+    private Object error;
+    private Date created_at;
+    private Date updated_at;
+    private Metadata metadata;
 }
