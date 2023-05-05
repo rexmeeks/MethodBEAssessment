@@ -1,5 +1,6 @@
 package com.method.donuts.controller;
 
+import com.method.donuts.bos.base.ReportsResponse;
 import com.method.donuts.service.ReportService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -23,6 +25,7 @@ public class ReportController {
     @Autowired
     private ReportService reportService;
 
+    @CrossOrigin("http://localhost:3000")
     @GetMapping("/reports/{id}")
     public ResponseEntity<?> getReportByIdAndType(@PathVariable String id, @RequestParam("type") String type) {
         if(id.isEmpty()) {
@@ -57,4 +60,9 @@ public class ReportController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @CrossOrigin("http://localhost:3000")
+    @GetMapping("/reports")
+    public ResponseEntity<ReportsResponse> getAllReports() {
+        return new ResponseEntity<>(reportService.getAllReports(), HttpStatus.OK);
+    }
 }
