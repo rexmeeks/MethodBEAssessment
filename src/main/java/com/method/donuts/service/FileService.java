@@ -1,6 +1,7 @@
 package com.method.donuts.service;
 
 
+import com.method.donuts.bos.base.PreuploadResponseBO;
 import com.method.donuts.bos.base.ResponseDO;
 import com.method.donuts.bos.method.accounts.Ach;
 import com.method.donuts.bos.method.accounts.Liability;
@@ -67,10 +68,13 @@ public class FileService {
     @Autowired
     private TaskExecutor taskExecutor;
 
-    public ResponseDO digestPayInfo(PayInfoBO payInfoBO, String fileName) {
+    public PreuploadResponseBO digestPayInfo(PayInfoBO payInfoBO, String fileName, Boolean preupload) {
         try {
             // todo setup something for adding a delay
             MethodObjects methodObjects = fileTransformer.xmlToMethodObjects(payInfoBO);
+            if(preupload) {
+                return fileTransformer.getPreuploadResponseBoFromStoresMap(methodObjects.getStores());
+            }
             Map<String, String> storesMap = new HashMap<>();
             Map<String, String> individualsMap = new HashMap<>();
             Map<String, String> storeToAccountMap = new HashMap<>();
@@ -113,11 +117,7 @@ public class FileService {
             CompletableFuture<List<Boolean>> futureListMerchantIds = CompletableFuture.allOf(merchantIdFutures.toArray(new CompletableFuture[merchantIdFutures.size()])).thenApply(voidArg -> merchantIdFutures.stream()
                     .map(CompletableFuture::join)
                     .collect(Collectors.toList()));
-            List<Boolean> test1 = futureListMerchantIds.get();
-
-//            if(merchantId != null) {
-//                merchantIdMap.put(key, merchantId);
-//            }
+            futureListMerchantIds.get();
 
             methodObjects.getIndividuals().forEach((dunkinId, individual) -> {
                 paymentsFutures.add(CompletableFuture.supplyAsync(() -> extracted(methodObjects, individualsMap, storeToAccountMap, merchantIdMap, entityMappings, loanAccountMappings, paymentsMadeMap, dunkinId, individual), taskExecutor));
@@ -127,7 +127,7 @@ public class FileService {
             CompletableFuture<List<Boolean>> futureLisPayments = CompletableFuture.allOf(merchantIdFutures.toArray(new CompletableFuture[merchantIdFutures.size()])).thenApply(voidArg -> paymentsFutures.stream()
                     .map(CompletableFuture::join)
                     .collect(Collectors.toList()));
-            List<Boolean> test2 = futureLisPayments.get();
+            futureLisPayments.get();
 
             if(!entityMappings.isEmpty()) {
                 entityRepository.saveAll(entityMappings);
@@ -138,7 +138,6 @@ public class FileService {
             if(!loanAccountMappings.isEmpty()) {
                 loanAccountRepository.saveAll(loanAccountMappings);
             }
-            log.info("test");
 
             String reportId = methodReportService.createReport();
 
@@ -146,15 +145,20 @@ public class FileService {
 
             reportsRepository.save(reports);
 
-            methodReportService.retrieveReport(reportId);
-
+            PreuploadResponseBO preuploadResponseBO = new PreuploadResponseBO();
+            preuploadResponseBO.setReportId(reportId);
+            return preuploadResponseBO;
         } catch (Exception e) {
+            // this isn't actually ideal, because an issue could happen on any of the actions, so I'd want to implement some form of safe commits, but I'd consider that out of scope for this
             log.error(e.getMessage());
             e.printStackTrace();
+            PreuploadResponseBO preuploadResponseBO = new PreuploadResponseBO();
+            preuploadResponseBO.setResponse("Payments failed");
+            return preuploadResponseBO;
         }
-        return null;
     }
 
+    // todo fix this monstrosity
     private Boolean extracted(MethodObjects methodObjects, Map<String, String> individualsMap, Map<String, String> storeToAccountMap, Map<String, String> merchantIdMap, List<EntityMapping> entityMappings, List<LoanAccountMapping> loanAccountMappings, Map<String, List<String>> paymentsMadeMap, String dunkinId, Entity individual) {
         Collection<LoanAccountMapping> foundLoanAccountMapping = loanAccountRepository.findAllByDunkinId(dunkinId);
         if(foundLoanAccountMapping.isEmpty()) {

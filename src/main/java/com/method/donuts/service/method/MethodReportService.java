@@ -72,7 +72,7 @@ public class MethodReportService {
         return null;
     }
 
-    public ReportData retrieveReport(String id) {
+    public List<CsvRow> retrieveReport(String id) {
         ReportData reportData = null;
 
 //        HttpHeaders headers = new HttpHeaders();
@@ -103,9 +103,7 @@ public class MethodReportService {
                     .withType(CsvRow.class)
                     .withIgnoreLeadingWhiteSpace(true)
                     .build();
-            List<CsvRow> listOfPayments = csvToBean.parse();
-            File file1 = csvTransformer.transformCsvRowsToDunkinBranchPayments(listOfPayments);
-            log.info("test");
+            return csvToBean.parse();
 
         } catch(InterruptedException e) {
             log.error("bucket blocking was interuppted, but probably shouldn't happen");
@@ -117,7 +115,5 @@ public class MethodReportService {
             log.error(e.getMessage());
             return null;
         }
-
-        return reportData;
     }
 }

@@ -1,5 +1,7 @@
 package com.method.donuts.transformer;
 
+import com.method.donuts.bos.base.PreuploadPayment;
+import com.method.donuts.bos.base.PreuploadResponseBO;
 import com.method.donuts.bos.method.accounts.Account;
 import com.method.donuts.bos.method.accounts.Ach;
 import com.method.donuts.bos.method.accounts.Liability;
@@ -16,17 +18,27 @@ import com.method.donuts.bos.report.xml.PayeeBO;
 import com.method.donuts.bos.report.xml.PayorBO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.keyvalue.MultiKey;
-import org.apache.commons.lang3.tuple.Triple;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Component
 @Slf4j
 public class FileTransformer {
+
+    public PreuploadResponseBO getPreuploadResponseBoFromStoresMap(Map<String, Entity> stores) {
+
+        PreuploadResponseBO preuploadResponseBO = new PreuploadResponseBO();
+        List<PreuploadPayment> preuploadPaymentList = new ArrayList<>();
+        stores.forEach((key, value) -> {
+            preuploadPaymentList.add(new PreuploadPayment(key, value.getPaymentTotal()));
+        });
+        preuploadResponseBO.setPreuploadPayments(preuploadPaymentList);
+
+        return preuploadResponseBO;
+    }
 
     // todo will need to set a lot of the ids for the account and loan after creation
     public MethodObjects xmlToMethodObjects(PayInfoBO payInfoBO) {
@@ -60,8 +72,6 @@ public class FileTransformer {
 
             Payment payment = new Payment();
 
-            setCorportation(stores, payorBO, dunkinCorpId);
-
             // multikey is plaidId, loanAccountNumber, and corpId
             MultiKey<String> multiKey = new MultiKey<>(payeeBO.getPlaidId(), payeeBO.getLoanAccountNumber());
 
@@ -70,6 +80,8 @@ public class FileTransformer {
             payment.setAmount(Math.round(Float.parseFloat(rowBO.getAmount().substring(1)) * 100));
             payment.setDescription("Loan pmt");
             payment.setMetadata(new Metadata(dunkinCorpId, dunkinIndividualId));
+
+            setCorportation(stores, payorBO, dunkinCorpId, payment.getAmount());
 
             loanLiability.setNumber(payeeBO.getLoanAccountNumber());
             loanLiability.setPlaid_id(payeeBO.getPlaidId());
@@ -135,7 +147,7 @@ public class FileTransformer {
 
     }
 
-    private void setCorportation(Map<String, Entity> stores, PayorBO payorBO, String dunkinCorpId) {
+    private void setCorportation(Map<String, Entity> stores, PayorBO payorBO, String dunkinCorpId, Integer paymentAmount) {
         if (!stores.containsKey(dunkinCorpId)) {
             Entity corporationEntity = new Entity();
             Corporation corporation = new Corporation();
@@ -166,7 +178,10 @@ public class FileTransformer {
             corporationEntity.setAddress(corporationAddress);
             corporationEntity.setType("c_corporation");
             corporationEntity.setMetadata(new Metadata(dunkinCorpId));
+            corporationEntity.setPaymentTotal(paymentAmount);
             stores.put(payorBO.getDunkinId(), corporationEntity);
+        } else {
+            stores.get(dunkinCorpId).setPaymentTotal((stores.get(dunkinCorpId).getPaymentTotal() + paymentAmount));
         }
     }
 }

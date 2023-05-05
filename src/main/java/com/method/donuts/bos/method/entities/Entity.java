@@ -36,4 +36,7 @@ public class Entity {
 
     @JsonIgnore
     private Map<String, Account> liabilities = new HashMap<>();
+
+    @JsonIgnore
+    private Integer paymentTotal;
 }

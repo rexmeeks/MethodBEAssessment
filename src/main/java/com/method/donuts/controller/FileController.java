@@ -1,6 +1,7 @@
 package com.method.donuts.controller;
 
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.method.donuts.bos.base.PreuploadResponseBO;
 import com.method.donuts.bos.report.xml.PayInfoBO;
 import com.method.donuts.service.FileService;
 import lombok.extern.slf4j.Slf4j;
@@ -25,13 +26,13 @@ public class FileController {
     private FileService fileService;
 
     @PostMapping("/uploadPayouts")
-    public ResponseEntity<String> uploadPaylist(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<PreuploadResponseBO> uploadPaylist(@RequestParam("file") MultipartFile file, @RequestParam("preupload") String preupload) {
         if(file.isEmpty()) {
-            return new ResponseEntity<>("should've uploaded a file, kid", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new PreuploadResponseBO("should've uploaded a file, kid"), HttpStatus.BAD_REQUEST);
         }
 
         if(file.getOriginalFilename() == null) {
-            return new ResponseEntity<>("i think files without names are bad news, probably", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new PreuploadResponseBO("i think files without names are bad news, probably"), HttpStatus.BAD_REQUEST);
         }
 
         try {
@@ -43,19 +44,16 @@ public class FileController {
 
             XmlMapper xmlMapper = new XmlMapper();
             PayInfoBO payInfoBO = xmlMapper.readValue(path, PayInfoBO.class);
-            fileService.digestPayInfo(payInfoBO, path.getName());
+            PreuploadResponseBO preuploadResponseBO = fileService.digestPayInfo(payInfoBO, path.getName(), preupload.equals("true"));
 
             log.info("test");
+            return new ResponseEntity<>(preuploadResponseBO, HttpStatus.OK);
 
         } catch (Exception e) {
             log.error(e.getMessage());
             e.printStackTrace();
+            return new ResponseEntity<>(new PreuploadResponseBO("Welp, something bad happened, payments probably didn't go through"), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping("/payoutReports")
-    public ResponseEntity getPayoutCSV() {
-        return new ResponseEntity(HttpStatus.OK);
-    }
 }
