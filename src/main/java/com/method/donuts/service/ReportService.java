@@ -2,7 +2,6 @@ package com.method.donuts.service;
 
 import com.method.donuts.bos.base.ReportsResponse;
 import com.method.donuts.bos.method.reports.CsvRow;
-import com.method.donuts.entities.Reports;
 import com.method.donuts.repository.ReportsRepository;
 import com.method.donuts.service.method.MethodReportService;
 import com.method.donuts.transformer.CsvTransformer;
@@ -37,7 +36,7 @@ public class ReportService {
 
     public ReportsResponse getAllReports() {
         ReportsResponse reportsResponse = new ReportsResponse();
-        reportsResponse.setReportsList(IterableUtils.toList(reportsRepository.findAll()));
+        reportsResponse.setReportsList(IterableUtils.toList(reportsRepository.findAllByOrderByUploadedOnDesc()));
         return reportsResponse;
     }
 }

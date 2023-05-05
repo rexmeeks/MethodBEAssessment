@@ -59,8 +59,7 @@ public class MethodReportService {
             log.error(e.getMessage());
             return null;
         } catch (Exception e) {
-            // todo add interupted exception and more specific exception
-            log.error("oops lmao, retrieve entity failed");
+            log.error("create report failed");
             log.error(e.getMessage());
             return null;
         }
@@ -69,7 +68,7 @@ public class MethodReportService {
             return reportData.getData().get(0).getId();
         }
 
-        return null;
+        return "report was null for some reason";
     }
 
     public List<CsvRow> retrieveReport(String id) {

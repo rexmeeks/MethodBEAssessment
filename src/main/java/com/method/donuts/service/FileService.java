@@ -2,13 +2,11 @@ package com.method.donuts.service;
 
 
 import com.method.donuts.bos.base.PreuploadResponseBO;
-import com.method.donuts.bos.base.ResponseDO;
 import com.method.donuts.bos.method.accounts.Ach;
 import com.method.donuts.bos.method.accounts.Liability;
 import com.method.donuts.bos.method.base.MethodObjects;
 import com.method.donuts.bos.method.entities.Entity;
 import com.method.donuts.bos.method.payments.Payment;
-import com.method.donuts.bos.method.reports.ReportData;
 import com.method.donuts.bos.report.xml.PayInfoBO;
 import com.method.donuts.entities.AchAccountMapping;
 import com.method.donuts.entities.EntityMapping;
@@ -70,7 +68,6 @@ public class FileService {
 
     public PreuploadResponseBO digestPayInfo(PayInfoBO payInfoBO, String fileName, Boolean preupload) {
         try {
-            // todo setup something for adding a delay
             MethodObjects methodObjects = fileTransformer.xmlToMethodObjects(payInfoBO);
             if(preupload) {
                 return fileTransformer.getPreuploadResponseBoFromStoresMap(methodObjects.getStores());
@@ -85,11 +82,9 @@ public class FileService {
 
             // Async stuff
             List<CompletableFuture<AchAccountMapping>> achAccountFutures = new ArrayList<>();
-            // Async stuff
             List<CompletableFuture<Boolean>> merchantIdFutures = new ArrayList<>();
             List<CompletableFuture<Boolean>> paymentsFutures = new ArrayList<>();
 
-            // todo this will need to be different, just temporary to make sure things work
             Map<String, List<String>> paymentsMadeMap = new HashMap<>();
 
             methodObjects.getStores().forEach((dunkinId, corp) -> {
@@ -107,7 +102,6 @@ public class FileService {
             });
 
 
-            // todo maybe don't do all of and just iterate through them, 2nd'd
             CompletableFuture<List<AchAccountMapping>> futureListOfAchAccounts = CompletableFuture.allOf(achAccountFutures.toArray(new CompletableFuture[achAccountFutures.size()])).thenApply(voidArg -> achAccountFutures.stream()
                     .map(CompletableFuture::join)
                     .collect(Collectors.toList()));
@@ -123,7 +117,7 @@ public class FileService {
                 paymentsFutures.add(CompletableFuture.supplyAsync(() -> extracted(methodObjects, individualsMap, storeToAccountMap, merchantIdMap, entityMappings, loanAccountMappings, paymentsMadeMap, dunkinId, individual), taskExecutor));
             });
 
-            //todo, not everything is being mapped, definitely need a concurrent list
+
             CompletableFuture<List<Boolean>> futureLisPayments = CompletableFuture.allOf(merchantIdFutures.toArray(new CompletableFuture[merchantIdFutures.size()])).thenApply(voidArg -> paymentsFutures.stream()
                     .map(CompletableFuture::join)
                     .collect(Collectors.toList()));
@@ -158,7 +152,7 @@ public class FileService {
         }
     }
 
-    // todo fix this monstrosity
+    // in the interest of time, this is going to unfortunately have to be this ugly. I would likely just make one larger object and would never do this. It's just 2am while I'm cleaning everything up
     private Boolean extracted(MethodObjects methodObjects, Map<String, String> individualsMap, Map<String, String> storeToAccountMap, Map<String, String> merchantIdMap, List<EntityMapping> entityMappings, List<LoanAccountMapping> loanAccountMappings, Map<String, List<String>> paymentsMadeMap, String dunkinId, Entity individual) {
         Collection<LoanAccountMapping> foundLoanAccountMapping = loanAccountRepository.findAllByDunkinId(dunkinId);
         if(foundLoanAccountMapping.isEmpty()) {
