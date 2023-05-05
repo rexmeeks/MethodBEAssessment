@@ -13,9 +13,6 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 @Service
 @Slf4j
@@ -48,7 +45,6 @@ public class MethodEntityService {
             log.error(e.getMessage());
             return null;
         } catch (Exception e) {
-            // todo add interupted exception and more specific exception
             log.error("oops lmao, retrieve entity failed");
             log.error(e.getMessage());
             return null;
@@ -61,20 +57,4 @@ public class MethodEntityService {
         return null;
     }
 
-    public List<Entity> retrieveAllEntities(String type) {
-        List<Entity> entityList = new ArrayList<>();
-
-        // todo set params for individual vs corporation
-        try {
-            Entity[] entitiesResponse = restTemplate.getForObject("https://dev.methodfi.com/entities", Entity[].class);
-            if (entitiesResponse != null) {
-               entityList = Arrays.asList(entitiesResponse);
-            }
-        } catch (Exception e) {
-            log.error("oops lmao, retrieve all entities failed");
-            log.error(e.getMessage());
-        }
-
-        return entityList;
-    }
 }

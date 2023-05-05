@@ -68,17 +68,11 @@ public class MethodReportService {
             return reportData.getData().get(0).getId();
         }
 
-        return "report was null for some reason";
+        return null;
     }
 
     public List<CsvRow> retrieveReport(String id) {
-        ReportData reportData = null;
 
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.set("Authorization", "Bearer " + apiKey);
-//        headers.setContentType(MediaType.APPLICATION_JSON);
-
-//        HttpEntity<Report> request = new HttpEntity<>(null, headers);
         RequestCallback requestCallback = request -> {
             request
                     .getHeaders()
@@ -86,8 +80,6 @@ public class MethodReportService {
             request.getHeaders().set("Authorization", "Bearer " + apiKey);
         };
 
-
-        // todo set id
         try {
             bucket.asBlocking().consume(1);
             File file = restTemplate.execute("https://dev.methodfi.com/reports/" + id + "/download", HttpMethod.GET, requestCallback, clientHttpResponse -> {
@@ -95,8 +87,6 @@ public class MethodReportService {
                 StreamUtils.copy(clientHttpResponse.getBody(), new FileOutputStream(ret));
                 return ret;
             });
-//            ResponseEntity<ReportData> responseEntity = restTemplate.exchange(, HttpMethod.GET, request, ReportData.class);
-//            reportData = responseEntity.getBody();
             Reader reader = new FileReader(file);
             CsvToBean<CsvRow> csvToBean = new CsvToBeanBuilder(reader)
                     .withType(CsvRow.class)
@@ -109,7 +99,6 @@ public class MethodReportService {
             log.error(e.getMessage());
             return null;
         } catch (Exception e) {
-            // todo add interupted exception and more specific exception
             log.error("oops lmao, retrieve entity failed");
             log.error(e.getMessage());
             return null;

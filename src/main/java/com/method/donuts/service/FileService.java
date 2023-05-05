@@ -66,6 +66,16 @@ public class FileService {
     @Autowired
     private TaskExecutor taskExecutor;
 
+
+    /*
+     * Take payinfoBO pass that to transformer, that will transform all of those into smaller lists of just unique source and destination accounts
+     * After that we do a couple different things, first we create all of the stores (source accounts and entities)
+     * then we get mappings of all plaid ids -> merchant Ids
+     * then we create all of the employees (destination acccounts and entities) (an employee can have any number of accounts)
+     * and finally we create all the payment objects with those different mappings
+     *
+     * the ugly looking part is the quick way to spin up async operations in spring
+     */
     public PreuploadResponseBO digestPayInfo(PayInfoBO payInfoBO, String fileName, Boolean preupload) {
         try {
             MethodObjects methodObjects = fileTransformer.xmlToMethodObjects(payInfoBO);
@@ -114,7 +124,7 @@ public class FileService {
             futureListMerchantIds.get();
 
             methodObjects.getIndividuals().forEach((dunkinId, individual) -> {
-                paymentsFutures.add(CompletableFuture.supplyAsync(() -> extracted(methodObjects, individualsMap, storeToAccountMap, merchantIdMap, entityMappings, loanAccountMappings, paymentsMadeMap, dunkinId, individual), taskExecutor));
+                paymentsFutures.add(CompletableFuture.supplyAsync(() -> makePayments(methodObjects, individualsMap, storeToAccountMap, merchantIdMap, entityMappings, loanAccountMappings, paymentsMadeMap, dunkinId, individual), taskExecutor));
             });
 
 
@@ -153,7 +163,10 @@ public class FileService {
     }
 
     // in the interest of time, this is going to unfortunately have to be this ugly. I would likely just make one larger object and would never do this. It's just 2am while I'm cleaning everything up
-    private Boolean extracted(MethodObjects methodObjects, Map<String, String> individualsMap, Map<String, String> storeToAccountMap, Map<String, String> merchantIdMap, List<EntityMapping> entityMappings, List<LoanAccountMapping> loanAccountMappings, Map<String, List<String>> paymentsMadeMap, String dunkinId, Entity individual) {
+    /*
+     * this function actually does the payments, so taking all of the store account ids, employee loan account ids, and then applying the total of payments to that
+     */
+    private Boolean makePayments(MethodObjects methodObjects, Map<String, String> individualsMap, Map<String, String> storeToAccountMap, Map<String, String> merchantIdMap, List<EntityMapping> entityMappings, List<LoanAccountMapping> loanAccountMappings, Map<String, List<String>> paymentsMadeMap, String dunkinId, Entity individual) {
         Collection<LoanAccountMapping> foundLoanAccountMapping = loanAccountRepository.findAllByDunkinId(dunkinId);
         if(foundLoanAccountMapping.isEmpty()) {
 
@@ -196,7 +209,7 @@ public class FileService {
         } else {
             foundLoanAccountMapping.forEach(loanAccountMapping ->  {
                 Map<String, Payment> userPayments = methodObjects.getUserPayments().get(dunkinId).get(new MultiKey<>(loanAccountMapping.getPlaidId(), loanAccountMapping.getLoanNumber()));
-                // todo make this a method
+                // I know this is a duplicate of the one above, and I had a todo here to pull this out, but it's 2:07am
                 userPayments.forEach((dunkinCorpId, payment) -> {
                     payment.setDestination(loanAccountMapping.getAccountId());
                     payment.setSource(storeToAccountMap.get(dunkinCorpId));

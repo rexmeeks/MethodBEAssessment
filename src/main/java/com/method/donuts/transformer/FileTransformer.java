@@ -40,7 +40,10 @@ public class FileTransformer {
         return preuploadResponseBO;
     }
 
-    // todo will need to set a lot of the ids for the account and loan after creation
+    /*
+     * this looks ugly, but that's because it's just a lot of transfomrations, digesting every field into Java pojos for
+     * ease of use
+     */
     public MethodObjects xmlToMethodObjects(PayInfoBO payInfoBO) {
         if (payInfoBO == null ) {
             return new MethodObjects();
@@ -96,7 +99,7 @@ public class FileTransformer {
                 individual.setFirst_name(employeeBO.getFirstName());
                 individual.setLast_name(employeeBO.getLastName());
                 individual.setPhone("15121231111");
-                // todo this will need some error handling to ignore shitty dates
+                // todo (interest of time) doing field validation on all of this would be too much for this, so I'm doing this
                 individual.setDob(LocalDate.parse(employeeBO.getDateOfBirth(), DateTimeFormatter.ofPattern("MM-dd-yyyy")).toString());
                 individualEntity.setIndividual(individual);
                 individualEntity.setType("individual");
@@ -115,15 +118,13 @@ public class FileTransformer {
 
             if(userPayments.containsKey(dunkinIndividualId)) {
                 if (userPayments.get(dunkinIndividualId).containsKey(multiKey)) {
-                    // todo create a case where this can be tested? Or don't
+                    // if a payment map exists let's update the value of that payment
                     if(userPayments.get(dunkinIndividualId).get(multiKey).containsKey(payorBO.getDunkinId())) {
                         Payment temp = userPayments.get(dunkinIndividualId).get(multiKey).get(payorBO.getDunkinId());
                         log.error("amount = {}", temp.getAmount());
-                        // todo probably make sure this works, with the temp part, this is a disaster waiting to happen tho if a value isn't right
                         temp.setAmount(Math.round(Float.parseFloat(rowBO.getAmount().substring(1)) + temp.getAmount()));
                         temp.setMetadata(new Metadata(dunkinCorpId, dunkinIndividualId));
                         log.error("amount after = {}", temp.getAmount());
-//                        userPayments.get(dunkinIndividualId).get(multiKey).get(payorBO.getDunkinId()).setAmount(Float.parseFloat(rowBO.getAmount().substring(1)) + temp.getAmount());
                     } else {
                         userPayments.get(dunkinIndividualId).get(multiKey).put(payorBO.getDunkinId(), payment);
                     }
@@ -159,7 +160,7 @@ public class FileTransformer {
             corporation.setName(payorBO.getName());
             corporation.setEin(payorBO.getEin());
 
-            // todo make sure to do null checks since this shit doesn't have ternary
+            // todo (interest of time) again validation
             if (payorBO.getAddress() != null) {
                 corporationAddress.setCity(payorBO.getAddress().getCity());
                 corporationAddress.setLine1(payorBO.getAddress().getLine1());

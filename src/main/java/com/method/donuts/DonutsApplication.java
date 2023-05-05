@@ -28,6 +28,7 @@ public class DonutsApplication {
     @Bean
     public RestTemplate getRestTemplate() {
 //        return new RestTemplate();
+        // I'm just gonna leave it like this because the logging is nice, but this will make issues with tests, so a RequestResponseInterceptor would be ideal
         RestTemplate restTemplate = new RestTemplate(new BufferingClientHttpRequestFactory(new SimpleClientHttpRequestFactory()));
         List<ClientHttpRequestInterceptor> interceptors = new ArrayList<>();
         interceptors.add(new LoggingRequestInterceptor());

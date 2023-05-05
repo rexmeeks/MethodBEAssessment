@@ -43,7 +43,6 @@ public class MethodPaymentService {
             log.error(e.getMessage());
             return null;
         } catch (Exception e) {
-            // todo add interupted exception and more specific exception
             log.error("oops lmao, retrieve entity failed");
             log.error(e.getMessage());
             return null;

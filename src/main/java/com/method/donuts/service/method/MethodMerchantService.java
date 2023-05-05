@@ -1,8 +1,6 @@
 package com.method.donuts.service.method;
 
 import com.method.donuts.bos.method.entities.Entity;
-import com.method.donuts.bos.method.entities.EntityData;
-import com.method.donuts.bos.method.merchants.Merchant;
 import com.method.donuts.bos.method.merchants.MerchantData;
 import io.github.bucket4j.Bucket;
 import lombok.extern.slf4j.Slf4j;
@@ -13,10 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 
 @Service
@@ -55,7 +49,6 @@ public class MethodMerchantService {
             log.error(e.getMessage());
             return null;
         } catch (Exception e) {
-            // todo add interupted exception and more specific exception
             log.error("oops lmao, retrieve entity failed");
             log.error(e.getMessage());
             return null;
@@ -66,23 +59,5 @@ public class MethodMerchantService {
         }
 
         return null;
-    }
-
-
-    public List<Merchant> retrieveAllEntities(String type) {
-        List<Merchant> entityList = new ArrayList<>();
-
-        // todo set params for individual vs corporation
-        try {
-            Merchant[] merchantsResponse = restTemplate.getForObject("https://demo.methodfi.com/merchants", Merchant[].class);
-            if (merchantsResponse != null) {
-                entityList = Arrays.asList(merchantsResponse);
-            }
-        } catch (Exception e) {
-            log.error("oops lmao, retrieve all entities failed");
-            log.error(e.getMessage());
-        }
-
-        return entityList;
     }
 }
