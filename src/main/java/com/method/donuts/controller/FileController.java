@@ -50,7 +50,6 @@ public class FileController {
                 return new ResponseEntity<>(preuploadResponseBO, HttpStatus.INTERNAL_SERVER_ERROR);
             }
 
-            log.info("test");
             return new ResponseEntity<>(preuploadResponseBO, HttpStatus.OK);
 
         } catch (Exception e) {

@@ -39,7 +39,6 @@ public class ReportController {
             } else if(type.equals("dunkin")) {
                 file = reportService.getPaymentsByReportDunkinBranch(id);
             }
-            log.info("test");
 
             InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
 
