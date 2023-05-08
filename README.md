@@ -1,5 +1,7 @@
 # Getting Started
 
+### (probably best experienced with a fresh account, so you can change the token in the application.properties)
+
 Download repo (you're going to have to run both apps at the same time)
 
 install java jdk, I'm using 20, so imagine you'll probably want to have that
